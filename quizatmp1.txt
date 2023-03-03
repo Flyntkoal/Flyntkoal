@@ -1,0 +1,166 @@
+int val = 4;
+void handler(int sig)
+{
+    waitpid(-1, NULL, 0);
+    val++;
+}
+
+int main()
+{
+    int pid;
+    signal(SIGCHLD, handler);
+    pid = fork();
+    if (pid == 0)
+    {
+        val = 0;
+        exit(0);
+    }
+    printf("%d\n", val);
+    exit(0);
+}
+
+//////////////////////////////////////
+
+int pid = 0;
+
+void sigchild(int s)
+{
+    printf("I");
+    fflush(stdout);
+    if (pid)
+    {
+        kill(pid, SIGHUP);
+    }
+}
+void sighup(int s)
+{
+    printf("can");
+    fflush(stdout);
+    if (!pid)
+    {
+        kill(getppid(), SIGHUP);
+    }
+}
+int main()
+{
+    int status;
+    pid_t p;
+    Signal(SIGCHLD, sigchild);
+    Signal(SIGHUP, sighup);
+    int i;
+
+    for (i = 0; i <= 2; i++)
+    {
+        if ((pid = fork()) == 0)
+        {
+            kill(getppid(), SIGHUP); // getppid returns parent’s pid
+            sleep(1);
+            exit(0);
+        }
+        sleep(1);
+    }
+    if ((p = wait(&status)) > 0)
+    {
+        fprintf(stderr, "haz");
+    }
+    else
+    {
+        fprintf(stderr, "Cheezburger");
+    }
+    fflush(stdout);
+    return 0;
+}
+
+////////////////////////////////////////////////////
+
+A program blocks SIGCHLD and SIGUSR1. It is then sent a SIGCHLD, a SIGUSR1, and another SIGCHLD, in that order. What signals does the program receive after it unblocks both of those signals (you may assume the program does not receive any more signals after)?
+
+
+/////////////////////////////////////////////////////
+
+int pid = 0;
+
+void sigchild(int s)
+{
+    printf("I'm");
+    fflush(stdout);
+    if (pid)
+    {
+        kill(pid, SIGHUP);
+    }
+}
+void sighup(int s)
+{
+    printf("firing");
+    fflush(stdout);
+    if (!pid)
+    {
+        kill(getppid(), SIGHUP);
+    }
+}
+int main()
+{
+    int status;
+    pid_t p;
+    Signal(SIGCHLD, sigchild);
+    Signal(SIGHUP, sighup);
+    int i;
+    if ((pid = fork()) == 0)
+    {
+        kill(getppid(), SIGHUP); // getppid returns parent’s pid
+        sleep(1);
+        exit(0);
+    }
+    sleep(1);
+    if ((p = wait(&status)) > 0)
+    {
+        fprintf(stderr, "mah");
+    }
+    else
+    {
+        fprintf(stderr, "lazer");
+    }
+    fflush(stdout);
+    return 0;
+}
+
+////////////////////////////////////////////////////////////
+
+int main()
+{
+
+    int status;
+    int counter = 8;
+    if (fork() == 0)
+    {
+        counter++;
+        printf("%d", counter);
+    }
+    else
+    {
+
+        if (fork() == 0)
+        {
+
+            printf("5");
+
+            counter--;
+
+            printf("%d", counter);
+
+            exit(0);
+        }
+        else
+        {
+
+            if (wait(&status) > 0)
+            {
+
+                printf("6");
+            }
+        }
+    }
+
+    printf("3");
+    exit(0);
+}
